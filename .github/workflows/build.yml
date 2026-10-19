@@ -145,7 +145,8 @@ jobs:
         with:
           path: assets
           merge-multiple: true
-      - run: ls -la assets && test "$(ls assets | wc -l)" -eq 5
+          skip-decompress: true # our ZIPs are the final downloads, keep them as they are
+      - run: ls -laR assets && test "$(ls assets | wc -l)" -eq 5
       - name: Attach to release
         if: github.event_name == 'release'
         env:
