@@ -48,7 +48,10 @@ sealed class Client
 
 static class Program
 {
-    const string Version = "1.1.0";
+    // Single source of truth: <Version> in the csproj (CI overrides it with the release tag).
+    static readonly string Version = (System.Reflection.Assembly.GetExecutingAssembly()
+        .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+        .FirstOrDefault() as System.Reflection.AssemblyInformationalVersionAttribute)?.InformationalVersion.Split('+')[0] ?? "0.0.0";
     const string AppName = "Stockwerk Matrix Router";
     const int MaxLine = 1024, MaxAddress = 255, MaxClients = 32;
 
@@ -67,7 +70,7 @@ static class Program
     {
         bool noWindow = args.Contains("--no-window");
         var pos = args.Where(a => !a.StartsWith("--")).ToArray();
-        cfgPath = pos.Length > 0 ? pos[0] : Path.Combine(AppContext.BaseDirectory, "matrixrouter.json");
+        cfgPath = pos.Length > 0 ? pos[0] : Path.Combine(ConfigDir(), "matrixrouter.json");
         var legacy = Path.Combine(Path.GetDirectoryName(cfgPath), "viewercontrol.json"); // 1.0 name, keeps existing viewer setups
         var src = File.Exists(cfgPath) ? cfgPath : File.Exists(legacy) ? legacy : null;
         cfg = src != null ? JsonSerializer.Deserialize<Config>(File.ReadAllText(src)) : new Config();
@@ -113,6 +116,16 @@ static class Program
         foreach (var o in outs) o.Dispose();
         if (restart) Relaunch();
         return 0;
+    }
+
+    // Next to the program, except inside a macOS .app bundle (must stay unmodified): ~/Library/Application Support.
+    static string ConfigDir()
+    {
+        var dir = AppContext.BaseDirectory;
+        if (!dir.Contains(".app/Contents/")) return dir;
+        dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "StockwerkMatrixRouter");
+        Directory.CreateDirectory(dir);
+        return dir;
     }
 
     static string PanelUrl => $"http://127.0.0.1:{cfg.UiPort}/";

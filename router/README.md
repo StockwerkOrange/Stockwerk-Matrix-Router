@@ -16,19 +16,38 @@ Im Viewer wählst du **einmalig** einen Ausgang als Quelle. Danach schaltest du 
 
 „Schwarz“ löscht die Route: der Viewer zeigt dann die leere virtuelle Quelle.
 
-## Installation (Windows)
+## Installation
 
-1. Einmalig die kostenlose **.NET 8 Runtime** von Microsoft installieren. Fehlt sie, bietet der Router beim Start den Download an.
-2. ZIP entpacken (ganzen Ordner behalten) und **„Stockwerk Matrix Router.exe“** starten.
-3. Beim ersten Start die Windows-Firewall-Abfrage für *dotnet* mit „Zulassen“ (privates Netz) bestätigen – nötig für TCP 6390 und die OMT-Ports 6400–6600.
+Aus den [Releases](https://github.com/StockwerkOrange/Stockwerk-Matrix-Router/releases) das passende ZIP laden:
 
-Das Router-Fenster öffnet sich als eigene App (Microsoft Edge im App-Modus, ohne Browser-Leisten).
+| Datei | Für | Voraussetzung |
+| --- | --- | --- |
+| `StockwerkMatrixRouter-windows-x64.zip` | Windows 10/11 | keine |
+| `StockwerkMatrixRouter-macos-apple-silicon.zip` | Mac mit M1–M4 | macOS 12+ |
+| `StockwerkMatrixRouter-macos-intel.zip` | Mac mit Intel-Prozessor | macOS 12+ |
+| `StockwerkMatrixRouter-portable.zip` | Windows, macOS, Linux | [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) |
 
-- **Fenster schließen** lässt den Router weiterlaufen. Erneutes Starten der .exe öffnet nur das Fenster wieder.
+### Windows
+
+1. ZIP entpacken (ganzen Ordner behalten), **„Stockwerk Matrix Router.exe“** starten.
+2. Die Firewall-Abfrage mit „Zulassen“ (privates Netz) bestätigen – nötig für TCP 6390 und die OMT-Ports 6400–6600.
+3. Meldet SmartScreen „Der Computer wurde durch Windows geschützt“: *Weitere Informationen › Trotzdem ausführen* (das Programm ist nicht signiert).
+
+### Mac
+
+1. ZIP entpacken, **„Stockwerk Matrix Router.app“** z. B. nach *Programme* ziehen.
+2. Beim ersten Öffnen meldet macOS, dass die App nicht überprüft werden kann (sie ist nicht von Apple notarisiert): *Systemeinstellungen › Datenschutz & Sicherheit › Dennoch öffnen*. Alternativ im Terminal: `xattr -dr com.apple.quarantine "/Applications/Stockwerk Matrix Router.app"`.
+3. Die Abfrage „eingehende Netzwerkverbindungen erlauben“ bestätigen.
+
+Die App hat kein Dock-Symbol; ihr Fenster öffnet sich in Chrome oder Edge im App-Modus, sonst in Safari. Einstellungen liegen unter `~/Library/Application Support/StockwerkMatrixRouter/`.
+
+### Bedienung
+
+Das Router-Fenster öffnet sich als eigene App (unter Windows Microsoft Edge im App-Modus, ohne Browser-Leisten).
+
+- **Fenster schließen** lässt den Router weiterlaufen. Erneutes Starten öffnet nur das Fenster wieder.
 - **Beenden** im Fenster stoppt den Router. Die Viewer bleiben auf ihrer letzten Quelle.
-- **Autostart:** Verknüpfung auf die .exe in `shell:startup` legen. Mit dem Zusatz `--no-window` im Verknüpfungsziel startet er ohne Fenster.
-
-macOS / Linux: `./start-mac-linux.sh` (öffnet das Fenster in Chrome/Edge im App-Modus oder im Standardbrowser).
+- **Autostart (Windows):** Verknüpfung auf die .exe in `shell:startup` legen. Mit dem Zusatz `--no-window` im Verknüpfungsziel startet er ohne Fenster.
 
 ### Umstieg von OMT Viewer Control 1.0
 
@@ -36,7 +55,7 @@ Neuen Ordner neben den alten legen und `viewercontrol.json` aus dem alten Ordner
 
 ## Einstellungen
 
-Im Fenster unter **Einstellungen**: Name der Ausgänge, Anzahl (1–16), TCP-Port für Companion, Port des Fensters. Gespeichert wird in `matrixrouter.json` neben dem Programm, zusammen mit den aktuellen Routen. Nach einem Neustart sind die letzten Routen wieder aktiv.
+Im Fenster unter **Einstellungen**: Name der Ausgänge, Anzahl (1–16), TCP-Port für Companion, Port des Fensters. Gespeichert wird in `matrixrouter.json` neben dem Programm (Mac-App: im Ordner oben), zusammen mit den aktuellen Routen. Nach einem Neustart sind die letzten Routen wieder aktiv.
 
 ## TCP-Protokoll
 
@@ -70,6 +89,8 @@ Fehler kommen als `ERR <text>`.
 - Gesteuert wird die Quellenwahl; Vollbild, Mute und Tally bleiben beim Viewer.
 
 ## Selbst bauen
+
+Die Release-Dateien baut die GitHub Action `.github/workflows/build.yml` automatisch, sobald eine Release veröffentlicht wird. Lokal:
 
 ```
 dotnet publish StockwerkMatrixRouter.csproj -c Release -p:UseAppHost=false -o dist

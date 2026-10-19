@@ -25,7 +25,12 @@ Das Video läuft direkt von der Quelle zum Viewer, nicht durch den Router.
 
 ## Schnellstart
 
-1. **Router:** fertiges ZIP aus den [Releases](../../releases) entpacken, `Stockwerk Matrix Router.exe` starten (benötigt die .NET 8 Runtime). Details: [router/README.md](router/README.md).
+1. **Router:** passendes ZIP aus den [Releases](../../releases) laden – keine weitere Installation nötig:
+   - Windows: `StockwerkMatrixRouter-windows-x64.zip` → `Stockwerk Matrix Router.exe`
+   - Mac: `StockwerkMatrixRouter-macos-apple-silicon.zip` (M1–M4) oder `…-macos-intel.zip` → `Stockwerk Matrix Router.app`
+   - `…-portable.zip` läuft überall, braucht aber die .NET 8 Runtime.
+
+   Details: [router/README.md](router/README.md).
 2. Im Viewer einmalig `RECHNERNAME (Matrix Out 1)` als Quelle wählen.
 3. **Companion:** `omt-monitor-x.y.z.tgz` aus den Releases unter *Modules › Import module package* laden, Verbindung „OMT Monitor“ anlegen, Gerät *Stockwerk Matrix Router (TCP)*, IP des Router-Rechners, Port 6390.
 

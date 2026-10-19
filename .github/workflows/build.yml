@@ -1,0 +1,151 @@
+# Builds and tests both parts. On a published release the downloads are attached to it.
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write # attach files to releases
+
+env:
+  DOTNET_NOLOGO: 1
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+jobs:
+  companion-module:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: companion-module
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm test
+      - run: npm run package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: companion-module
+          path: companion-module/*.tgz
+
+  router-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - run: router/test/run-linux-test.sh
+
+  router-windows:
+    # Self-contained single .exe: no .NET installation needed, no console window.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Publish
+        shell: pwsh
+        run: |
+          $ver = if ($env:GITHUB_EVENT_NAME -eq 'release') { '${{ github.event.release.tag_name }}'.TrimStart('v') } else { '' }
+          $verArg = if ($ver) { "-p:Version=$ver" } else { '' }
+          dotnet publish router/StockwerkMatrixRouter.csproj -c Release -r win-x64 --self-contained true `
+            -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true `
+            -p:OutputType=WinExe -p:ApplicationIcon=launcher/icon.ico $verArg -o publish
+          $dir = 'dist/StockwerkMatrixRouter'
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          Move-Item publish/StockwerkMatrixRouter.exe "$dir/Stockwerk Matrix Router.exe"
+          Copy-Item router/README.md, LICENSE $dir
+          Copy-Item router/libomtnet/LICENSE.txt "$dir/libomtnet-LICENSE.txt"
+          Compress-Archive -Path $dir -DestinationPath dist/StockwerkMatrixRouter-windows-x64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: router-windows-x64
+          path: dist/StockwerkMatrixRouter-windows-x64.zip
+
+  router-portable:
+    # Needs the .NET 8 runtime; runs on Windows (via the small starter), macOS and Linux.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq gcc-mingw-w64-x86-64 binutils-mingw-w64-x86-64
+      - name: Publish
+        run: |
+          VER=""; [ "$GITHUB_EVENT_NAME" = release ] && VER="-p:Version=${GITHUB_REF_NAME#v}"
+          D=dist/StockwerkMatrixRouter
+          dotnet publish router/StockwerkMatrixRouter.csproj -c Release -p:UseAppHost=false $VER -o $D
+          rm -f $D/*.pdb
+          (cd router && x86_64-w64-mingw32-windres launcher/res.rc -O coff -o ../res.o)
+          x86_64-w64-mingw32-gcc -municode -mwindows -O2 -s router/launcher/launcher.c res.o -o "$D/Stockwerk Matrix Router.exe"
+          cp router/launcher/start-mac-linux.sh $D/ && chmod +x $D/start-mac-linux.sh
+          cp router/README.md LICENSE $D/ && cp router/libomtnet/LICENSE.txt $D/libomtnet-LICENSE.txt
+          (cd dist && zip -qr StockwerkMatrixRouter-portable.zip StockwerkMatrixRouter)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: router-portable
+          path: dist/StockwerkMatrixRouter-portable.zip
+
+  router-macos:
+    # Self-contained .app per CPU, ad-hoc signed (required on Apple Silicon). Not notarized.
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        include:
+          - rid: osx-arm64
+            name: macos-apple-silicon
+          - rid: osx-x64
+            name: macos-intel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build app
+        run: |
+          VER=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' router/StockwerkMatrixRouter.csproj)
+          [ "$GITHUB_EVENT_NAME" = release ] && VER="${GITHUB_REF_NAME#v}"
+          dotnet publish router/StockwerkMatrixRouter.csproj -c Release -r ${{ matrix.rid }} --self-contained true \
+            -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true \
+            -p:Version=$VER -o publish
+          APP="dist/StockwerkMatrixRouter/Stockwerk Matrix Router.app"
+          mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+          cp publish/StockwerkMatrixRouter "$APP/Contents/MacOS/"
+          sed "s/__VERSION__/$VER/" router/launcher/Info.plist > "$APP/Contents/Info.plist"
+          mkdir icon.iconset
+          for s in 16 32 128 256 512; do
+            sips -z $s $s router/launcher/icon.png --out icon.iconset/icon_${s}x${s}.png >/dev/null
+            sips -z $((s*2)) $((s*2)) router/launcher/icon.png --out icon.iconset/icon_${s}x${s}@2x.png >/dev/null
+          done
+          iconutil -c icns icon.iconset -o "$APP/Contents/Resources/AppIcon.icns"
+          codesign --force --deep --sign - "$APP"
+          cp router/README.md LICENSE dist/StockwerkMatrixRouter/ && cp router/libomtnet/LICENSE.txt dist/StockwerkMatrixRouter/libomtnet-LICENSE.txt
+          ditto -c -k --keepParent dist/StockwerkMatrixRouter StockwerkMatrixRouter-${{ matrix.name }}.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: router-${{ matrix.name }}
+          path: StockwerkMatrixRouter-${{ matrix.name }}.zip
+
+  release:
+    if: github.event_name == 'release'
+    needs: [companion-module, router-test, router-windows, router-portable, router-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          merge-multiple: true
+      - name: Attach to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" assets/* --clobber --repo "$GITHUB_REPOSITORY"
