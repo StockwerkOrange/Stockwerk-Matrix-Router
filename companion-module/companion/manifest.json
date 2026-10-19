@@ -1,0 +1,22 @@
+{
+	"$schema": "../node_modules/@companion-module/base/assets/manifest.schema.json",
+	"id": "omt-monitor",
+	"name": "omt-monitor",
+	"shortname": "OMT Monitor",
+	"description": "Control Open Media Transport monitors: OMT Mini, omtplayer and any OMT viewer via Stockwerk Matrix Router",
+	"version": "0.0.0",
+	"license": "MIT",
+	"repository": "git+https://github.com/StockwerkOrange/stockwerk-matrix-router.git",
+	"bugs": "https://github.com/StockwerkOrange/stockwerk-matrix-router/issues",
+	"maintainers": [{ "name": "Matthias Stock", "email": "ClaudeAI@stockwerkorange.com" }],
+	"runtime": {
+		"type": "node22",
+		"api": "nodejs-ipc",
+		"apiVersion": "0.0.0",
+		"entrypoint": "../src/main.js"
+	},
+	"legacyIds": [],
+	"manufacturer": "Open Media Transport",
+	"products": ["OMT Mini", "omtplayer", "Stockwerk Matrix Router"],
+	"keywords": ["OMT", "Open Media Transport", "Video", "Monitor", "Viewer"]
+}

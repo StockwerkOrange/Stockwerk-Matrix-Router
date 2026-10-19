@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stockwerk Matrix Router</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23FF8A1F'/%3E%3Cg fill='%231B1F24'%3E%3Crect x='13' y='13' width='16' height='16' rx='3'/%3E%3Crect x='35' y='13' width='16' height='16' rx='3' opacity='.35'/%3E%3Crect x='13' y='35' width='16' height='16' rx='3' opacity='.35'/%3E%3Crect x='35' y='35' width='16' height='16' rx='3'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+:root {
+  --panel: #1B1F24;
+  --rail: #22272D;
+  --key: #2D333A;
+  --key-edge: #3B424B;
+  --key-shade: #15181C;
+  --text: #E7E9EB;
+  --muted: #8E98A2;
+  --lit: #FF8A1F;
+  --lit-text: #1B1F24;
+  --lit-glow: rgba(255, 138, 31, .45);
+  --led: #3DDC84;
+  --led-off: #4A525B;
+  --warn: #FF6B5E;
+  --focus: #7CC4FF;
+  --black-key: #121518;
+  --black-text: #E7E9EB;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --panel: #E6E9EC;
+    --rail: #F4F5F7;
+    --key: #FFFFFF;
+    --key-edge: #C7CDD4;
+    --key-shade: #B9C0C8;
+    --text: #1A1D21;
+    --muted: #5A646E;
+    --lit-glow: rgba(255, 138, 31, .35);
+    --led: #13A04F;
+    --led-off: #B4BCC5;
+    --warn: #D23B2E;
+    --focus: #1F6FD1;
+    --black-key: #2B3036;
+    --black-text: #F2F3F5;
+    color-scheme: light;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--panel);
+  color: var(--text);
+  font: 15px/1.4 Bahnschrift, "DIN Alternate", "DIN Next LT Pro", "Segoe UI", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  flex-direction: column;
+}
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--key-edge);
+}
+.brand { display: flex; align-items: center; gap: 12px; margin-right: auto; }
+.brand svg { width: 28px; height: 28px; flex: none; }
+.brand h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: .01em; }
+.brand small { color: var(--muted); font-size: 13px; }
+.status { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; white-space: nowrap; }
+.led { width: 10px; height: 10px; border-radius: 50%; background: var(--led-off); flex: none; }
+.led.on { background: var(--led); box-shadow: 0 0 8px var(--led); }
+.tool {
+  background: var(--key); border: 1px solid var(--key-edge); border-radius: 8px;
+  padding: 7px 14px; cursor: pointer; box-shadow: 0 2px 0 var(--key-shade);
+}
+.tool:active { transform: translateY(1px); box-shadow: 0 1px 0 var(--key-shade); }
+
+main { flex: 1; min-height: 0; overflow: auto; padding: 18px 22px 8px; }
+.dest {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  background: var(--rail);
+  border: 1px solid var(--key-edge);
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+.dest-head { padding: 14px 16px; border-right: 1px solid var(--key-edge); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; align-content: start; }
+.dest-no { grid-row: span 3; font-size: 44px; line-height: 1; font-weight: 700; color: var(--muted); min-width: 1.2ch; }
+.dest.routed .dest-no { color: var(--lit); }
+.dest-name { font-size: 17px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dest-viewer { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 13px; }
+.copy {
+  justify-self: start; background: none; border: 0; padding: 2px 0; color: var(--muted);
+  font-size: 12px; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px;
+}
+.copy:hover { color: var(--text); }
+
+.keys { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 10px; padding: 14px 16px; align-content: start; }
+.key {
+  min-width: 0; min-height: 64px; padding: 8px 10px; text-align: left; cursor: pointer;
+  background: var(--key); border: 1px solid var(--key-edge); border-radius: 9px;
+  box-shadow: 0 3px 0 var(--key-shade);
+  display: flex; flex-direction: column; justify-content: space-between;
+  transition: background-color .12s, box-shadow .12s, transform .05s;
+}
+.key:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--key-shade); }
+.key b {
+  font-family: "Bahnschrift SemiCondensed", Bahnschrift, "DIN Condensed", "Arial Narrow", sans-serif;
+  font-weight: 600; font-size: 16px; line-height: 1.15;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: break-word; hyphens: auto;
+}
+.key span { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.key.on { background: var(--lit); border-color: var(--lit); color: var(--lit-text); box-shadow: 0 3px 0 #B85A08, 0 0 18px var(--lit-glow); }
+.key.on span { color: var(--lit-text); opacity: .7; }
+.key.black { background: var(--black-key); color: var(--black-text); border-color: var(--black-key); }
+.key.black span { color: var(--black-text); opacity: .6; }
+.key.black.on { background: var(--lit); border-color: var(--lit); color: var(--lit-text); }
+.key.black.on span { color: var(--lit-text); }
+.key.gone { border-style: dashed; }
+.key.pending { animation: pend .6s ease-in-out infinite alternate; }
+@keyframes pend { to { border-color: var(--lit); } }
+
+.empty { color: var(--muted); font-size: 14px; max-width: 60ch; grid-column: 1 / -1; padding: 4px 0; }
+footer { padding: 8px 22px 14px; color: var(--muted); font-size: 13px; display: flex; gap: 18px; flex-wrap: wrap; }
+
+.banner {
+  position: fixed; inset: auto 22px 22px auto; max-width: 420px;
+  background: var(--rail); border: 1px solid var(--warn); border-left-width: 5px; border-radius: 10px;
+  padding: 12px 16px; box-shadow: 0 8px 30px rgba(0,0,0,.35); display: none;
+}
+.banner.show { display: block; }
+
+dialog {
+  background: var(--rail); color: var(--text); border: 1px solid var(--key-edge); border-radius: 14px;
+  padding: 22px 24px; width: min(440px, calc(100vw - 32px));
+}
+dialog::backdrop { background: rgba(0, 0, 0, .55); }
+dialog h2 { margin: 0 0 4px; font-size: 19px; }
+dialog p { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+label { display: block; margin-bottom: 12px; font-size: 14px; }
+label input {
+  display: block; width: 100%; margin-top: 4px; padding: 8px 10px;
+  background: var(--panel); border: 1px solid var(--key-edge); border-radius: 7px;
+}
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+.primary { background: var(--lit); border-color: var(--lit); color: var(--lit-text); font-weight: 600; box-shadow: 0 2px 0 #B85A08; }
+.msg { min-height: 1.4em; font-size: 14px; margin-top: 4px; }
+.msg.err { color: var(--warn); }
+
+@media (max-width: 720px) {
+  header { flex-wrap: wrap; padding: 12px 16px; }
+  .brand { width: 100%; }
+  .status { flex-basis: 100%; }
+  main { padding: 12px 16px; }
+  .dest { grid-template-columns: minmax(0, 1fr); }
+  .dest-head { border-right: 0; border-bottom: 1px solid var(--key-edge); }
+  .keys { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { .key, .key.pending { transition: none; animation: none; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#FF8A1F"/><g fill="#1B1F24"><rect x="13" y="13" width="16" height="16" rx="3"/><rect x="35" y="13" width="16" height="16" rx="3" opacity=".35"/><rect x="13" y="35" width="16" height="16" rx="3" opacity=".35"/><rect x="35" y="35" width="16" height="16" rx="3"/></g></svg>
+    <div><h1>Stockwerk Matrix Router</h1><small id="host">verbinde…</small></div>
+  </div>
+  <div class="status" title="Verbundene Steuerungen, z. B. Companion"><span class="led" id="ctlLed"></span><span id="ctl">–</span></div>
+  <button class="tool" id="btnSettings">Einstellungen</button>
+  <button class="tool" id="btnQuit">Beenden</button>
+</header>
+
+<main id="main" aria-live="polite"></main>
+
+<footer>
+  <span>Im Viewer einmalig den Ausgang als Quelle wählen, danach hier umschalten.</span>
+  <span>Fenster schließen lässt den Router weiterlaufen.</span>
+</footer>
+
+<div class="banner" id="banner" role="status"></div>
+
+<dialog id="dlgSettings">
+  <form id="formSettings" method="dialog">
+    <h2>Einstellungen</h2>
+    <p>Änderungen gelten nach einem Neustart des Routers. Wer den Namen ändert, muss die Ausgänge in den Viewern neu auswählen.</p>
+    <label>Name der Ausgänge<input name="namePrefix" maxlength="40" required></label>
+    <div class="row2">
+      <label>Anzahl Ausgänge<input name="channels" type="number" min="1" max="16" required></label>
+      <label>TCP-Port (Companion)<input name="tcpPort" type="number" min="1024" max="65535" required></label>
+    </div>
+    <label>Port dieses Fensters<input name="uiPort" type="number" min="1024" max="65535" required></label>
+    <div class="msg" id="setMsg"></div>
+    <div class="actions">
+      <button class="tool" value="cancel" formnovalidate>Abbrechen</button>
+      <button class="tool primary" id="btnSave" value="save">Speichern und neu starten</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgQuit">
+  <form method="dialog">
+    <h2>Router beenden?</h2>
+    <p>Die Viewer bleiben auf ihrer aktuellen Quelle. Umschalten geht erst wieder, wenn der Router läuft.</p>
+    <div class="actions">
+      <button class="tool" value="cancel">Abbrechen</button>
+      <button class="tool primary" value="quit">Router beenden</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let state = null, pending = {}, expectRestart = false;
+
+const post = (path, body) =>
+  fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Matrix-Router': '1' }, body: JSON.stringify(body) }).then((r) => r.json());
+
+// "HOST (Source Name)" -> name big, host small
+function split(addr) {
+  const m = /^(.*?) \((.*)\)$/.exec(addr);
+  return m ? { name: m[2], host: m[1] } : { name: addr, host: '' };
+}
+
+function key(out, addr, label, sub, extra) {
+  const b = document.createElement('button');
+  b.className = 'key' + (extra || '') + (out.route === addr ? ' on' : '') + (pending[out.n] === addr ? ' pending' : '');
+  b.innerHTML = '<b></b><span></span>';
+  b.firstChild.textContent = label;
+  b.lastChild.textContent = sub;
+  b.title = addr || 'Kein Bild';
+  b.setAttribute('aria-pressed', out.route === addr);
+  b.onclick = () => route(out.n, addr);
+  return b;
+}
+
+async function route(n, addr) {
+  pending[n] = addr;
+  render();
+  try {
+    const r = await post('/api/route', { ch: n, address: addr });
+    if (!r.ok) showBanner(r.error);
+  } catch { showBanner('Router nicht erreichbar.'); }
+  delete pending[n];
+  refresh();
+}
+
+function render() {
+  if (!state) return;
+  $('host').textContent = `${state.host}, TCP-Port ${state.tcpPort}, Version ${state.version}`;
+  $('ctl').textContent = state.clients === 1 ? '1 Steuerung verbunden' : `${state.clients} Steuerungen verbunden`;
+  $('ctlLed').classList.toggle('on', state.clients > 0);
+
+  const main = $('main');
+  main.replaceChildren();
+  for (const out of state.outputs) {
+    const d = document.createElement('section');
+    d.className = 'dest' + (out.route ? ' routed' : '');
+    d.setAttribute('aria-label', `Ausgang ${out.n}`);
+    const head = document.createElement('div');
+    head.className = 'dest-head';
+    const no = document.createElement('div'); no.className = 'dest-no'; no.textContent = out.n;
+    const nm = document.createElement('div'); nm.className = 'dest-name';
+    const routed = out.route ? split(out.route).name : 'Kein Bild';
+    nm.textContent = routed; nm.title = out.route || '';
+    const v = document.createElement('div'); v.className = 'dest-viewer';
+    v.innerHTML = `<span class="led${out.connections > 0 ? ' on' : ''}"></span>`;
+    v.append(out.connections > 0 ? 'Viewer verbunden' : 'Kein Viewer verbunden');
+    const cp = document.createElement('button'); cp.className = 'copy';
+    cp.textContent = out.name; cp.title = 'Diesen Namen im Viewer als Quelle wählen – klicken zum Kopieren';
+    cp.onclick = () => navigator.clipboard.writeText(out.name).then(() => showBanner(`„${out.name}“ kopiert.`, true));
+    head.append(no, nm, v, cp);
+
+    const keys = document.createElement('div');
+    keys.className = 'keys';
+    keys.append(key(out, '', 'Schwarz', 'kein Bild', ' black'));
+    for (const s of state.sources) { const p = split(s); keys.append(key(out, s, p.name, p.host)); }
+    if (out.route && !state.sources.includes(out.route)) {
+      const p = split(out.route);
+      keys.append(key(out, out.route, p.name, 'nicht im Netz gefunden', ' gone'));
+    }
+    if (!state.sources.length) {
+      const e = document.createElement('div'); e.className = 'empty';
+      e.textContent = 'Noch keine OMT-Quellen im Netz gefunden. Sie erscheinen hier automatisch, sobald sie senden.';
+      keys.append(e);
+    }
+    d.append(head, keys);
+    main.append(d);
+  }
+}
+
+let bannerTimer;
+function showBanner(text, ok) {
+  const b = $('banner');
+  b.textContent = text;
+  b.style.borderColor = ok ? 'var(--led)' : 'var(--warn)';
+  b.classList.add('show');
+  clearTimeout(bannerTimer);
+  if (ok) bannerTimer = setTimeout(() => b.classList.remove('show'), 2500);
+}
+
+let lastJson = '';
+async function refresh() {
+  try {
+    const r = await fetch('/api/state', { cache: 'no-store' });
+    const text = await r.text();
+    if (expectRestart || $('banner').dataset.down) { $('banner').classList.remove('show'); delete $('banner').dataset.down; expectRestart = false; }
+    if (text !== lastJson || Object.keys(pending).length) { lastJson = text; state = JSON.parse(text); render(); }
+  } catch {
+    $('banner').dataset.down = '1';
+    showBanner(expectRestart ? 'Router startet neu…' : 'Router läuft nicht. Starte die App erneut, um wieder umzuschalten.');
+  }
+}
+
+$('btnQuit').onclick = () => $('dlgQuit').showModal();
+$('dlgQuit').onclose = async () => {
+  if ($('dlgQuit').returnValue !== 'quit') return;
+  await post('/api/quit', {}).catch(() => {});
+  showBanner('Router beendet. Du kannst dieses Fenster schließen.');
+  clearInterval(timer);
+};
+
+$('btnSettings').onclick = () => {
+  const f = $('formSettings');
+  for (const [k, v] of Object.entries(state.settings)) if (f.elements[k]) f.elements[k].value = v;
+  $('setMsg').textContent = '';
+  $('dlgSettings').showModal();
+};
+$('formSettings').onsubmit = async (ev) => {
+  if (ev.submitter && ev.submitter.value !== 'save') return;
+  ev.preventDefault();
+  const f = ev.target;
+  const body = { namePrefix: f.namePrefix.value, channels: +f.channels.value, tcpPort: +f.tcpPort.value, uiPort: +f.uiPort.value };
+  const r = await post('/api/settings', body).catch(() => ({ ok: false, error: 'Router nicht erreichbar.' }));
+  if (!r.ok) { $('setMsg').textContent = r.error; $('setMsg').className = 'msg err'; return; }
+  $('dlgSettings').close();
+  const portChanged = body.uiPort !== state.settings.uiPort;
+  expectRestart = !portChanged;
+  await post('/api/quit', { restart: true }).catch(() => {});
+  showBanner(portChanged ? 'Router startet neu und öffnet ein neues Fenster.' : 'Router startet neu…', true);
+  if (portChanged) clearInterval(timer);
+};
+
+refresh();
+const timer = setInterval(refresh, 1000);
+</script>
+</body>
+</html>

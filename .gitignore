@@ -1,0 +1,7 @@
+node_modules/
+pkg/
+*.tgz
+bin/
+obj/
+dist/
+*.o

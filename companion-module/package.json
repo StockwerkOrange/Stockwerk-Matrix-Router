@@ -1,0 +1,25 @@
+{
+	"name": "omt-monitor",
+	"version": "1.2.0",
+	"main": "src/main.js",
+	"scripts": {
+		"test": "node test/test.js",
+		"package": "companion-module-build"
+	},
+	"license": "MIT",
+	"engines": {
+		"node": "^22"
+	},
+	"dependencies": {
+		"@companion-module/base": "~1.12.1"
+	},
+	"devDependencies": {
+		"@companion-module/tools": "^2.4.2"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/StockwerkOrange/stockwerk-matrix-router.git",
+		"directory": "companion-module"
+	},
+	"author": "Matthias Stock <ClaudeAI@stockwerkorange.com>"
+}
