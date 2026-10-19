@@ -23,23 +23,23 @@ jobs:
       run:
         working-directory: companion-module
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - run: npm ci
       - run: npm test
       - run: npm run package
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
-          name: companion-module
+          archive: false
           path: companion-module/*.tgz
 
   router-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 8.0.x
       - run: router/test/run-linux-test.sh
@@ -48,8 +48,8 @@ jobs:
     # Self-contained single .exe: no .NET installation needed, no console window.
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 8.0.x
       - name: Publish
@@ -66,17 +66,17 @@ jobs:
           Copy-Item router/README.md, LICENSE $dir
           Copy-Item router/libomtnet/LICENSE.txt "$dir/libomtnet-LICENSE.txt"
           Compress-Archive -Path $dir -DestinationPath dist/StockwerkMatrixRouter-windows-x64.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
-          name: router-windows-x64
+          archive: false
           path: dist/StockwerkMatrixRouter-windows-x64.zip
 
   router-portable:
     # Needs the .NET 8 runtime; runs on Windows (via the small starter), macOS and Linux.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 8.0.x
       - run: sudo apt-get update -qq && sudo apt-get install -y -qq gcc-mingw-w64-x86-64 binutils-mingw-w64-x86-64
@@ -91,9 +91,9 @@ jobs:
           cp router/launcher/start-mac-linux.sh $D/ && chmod +x $D/start-mac-linux.sh
           cp router/README.md LICENSE $D/ && cp router/libomtnet/LICENSE.txt $D/libomtnet-LICENSE.txt
           (cd dist && zip -qr StockwerkMatrixRouter-portable.zip StockwerkMatrixRouter)
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
-          name: router-portable
+          archive: false
           path: dist/StockwerkMatrixRouter-portable.zip
 
   router-macos:
@@ -107,8 +107,8 @@ jobs:
           - rid: osx-x64
             name: macos-intel
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 8.0.x
       - name: Build app
@@ -131,21 +131,23 @@ jobs:
           codesign --force --deep --sign - "$APP"
           cp router/README.md LICENSE dist/StockwerkMatrixRouter/ && cp router/libomtnet/LICENSE.txt dist/StockwerkMatrixRouter/libomtnet-LICENSE.txt
           ditto -c -k --keepParent dist/StockwerkMatrixRouter StockwerkMatrixRouter-${{ matrix.name }}.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
-          name: router-${{ matrix.name }}
+          archive: false
           path: StockwerkMatrixRouter-${{ matrix.name }}.zip
 
   release:
-    if: github.event_name == 'release'
+    # Runs every time so the hand-off is tested too; uploads only for a published release.
     needs: [companion-module, router-test, router-windows, router-portable, router-macos]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: assets
           merge-multiple: true
+      - run: ls -la assets && test "$(ls assets | wc -l)" -eq 5
       - name: Attach to release
+        if: github.event_name == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release upload "$GITHUB_REF_NAME" assets/* --clobber --repo "$GITHUB_REPOSITORY"

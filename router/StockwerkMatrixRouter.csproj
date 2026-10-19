@@ -7,7 +7,7 @@
     <AssemblyName>StockwerkMatrixRouter</AssemblyName>
     <Version>1.1.0</Version>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <NoWarn>$(NoWarn);CS0168;CS0219;CS0162;CS0414;CS0649;CS0169;CA1416;SYSLIB0011;SYSLIB0014</NoWarn>
+    <NoWarn>$(NoWarn);CS0168;CS0219;CS0162;CS0414;CS0649;CS0169;CA1416;SYSLIB0011;SYSLIB0014;SYSLIB0006;CA2200</NoWarn> <!-- warnings from the vendored libomtnet -->
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="test/**;launcher/**" />
