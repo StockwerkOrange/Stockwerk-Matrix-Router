@@ -1,4 +1,4 @@
-# 4 Out OMT Matrix
+# 16 Out OMT Matrix
 
 Macht **jeden OMT-Viewer umschaltbar** – auch solche ohne eigene Fernsteuerung (vMix OMT Viewer, Sienna OMT Video Monitor, OBS-Plugin, omtplayer). Bedienung über das eigene App-Fenster (Kreuzschiene), per Companion oder per TCP. Frühere Namen: *Stockwerk Matrix Router*, *OMT Viewer Control*.
 
@@ -18,28 +18,28 @@ Im Viewer wählst du **einmalig** einen Ausgang als Quelle. Danach schaltest du 
 
 ## Installation
 
-Aus den [Releases](https://github.com/StockwerkOrange/4-Out-OMT-Matrix/releases) das passende ZIP laden:
+Aus den [Releases](https://github.com/StockwerkOrange/16-Out-OMT-Matrix/releases) das passende ZIP laden:
 
 | Datei | Für | Voraussetzung |
 | --- | --- | --- |
-| `4OutOMTMatrix-windows-x64.zip` | Windows 10/11 | keine |
-| `4OutOMTMatrix-macos-apple-silicon.zip` | Mac mit M1–M4 | macOS 12+ |
-| `4OutOMTMatrix-macos-intel.zip` | Mac mit Intel-Prozessor | macOS 12+ |
-| `4OutOMTMatrix-portable.zip` | Windows, macOS, Linux | [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) |
+| `16OutOMTMatrix-windows-x64.zip` | Windows 10/11 | keine |
+| `16OutOMTMatrix-macos-apple-silicon.zip` | Mac mit M1–M4 | macOS 12+ |
+| `16OutOMTMatrix-macos-intel.zip` | Mac mit Intel-Prozessor | macOS 12+ |
+| `16OutOMTMatrix-portable.zip` | Windows, macOS, Linux | [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) |
 
 ### Windows
 
-1. ZIP entpacken (ganzen Ordner behalten), **„4 Out OMT Matrix.exe“** starten.
+1. ZIP entpacken (ganzen Ordner behalten), **„16 Out OMT Matrix.exe“** starten.
 2. Die Firewall-Abfrage mit „Zulassen“ (privates Netz) bestätigen – nötig für TCP 6390 und die OMT-Ports 6400–6600.
 3. Meldet SmartScreen „Der Computer wurde durch Windows geschützt“: *Weitere Informationen › Trotzdem ausführen* (das Programm ist nicht signiert).
 
 ### Mac
 
-1. ZIP entpacken, **„4 Out OMT Matrix.app“** z. B. nach *Programme* ziehen.
-2. Beim ersten Öffnen meldet macOS, dass die App nicht überprüft werden kann (sie ist nicht von Apple notarisiert): *Systemeinstellungen › Datenschutz & Sicherheit › Dennoch öffnen*. Alternativ im Terminal: `xattr -dr com.apple.quarantine "/Applications/4 Out OMT Matrix.app"`.
+1. ZIP entpacken, **„16 Out OMT Matrix.app“** z. B. nach *Programme* ziehen.
+2. Beim ersten Öffnen meldet macOS, dass die App nicht überprüft werden kann (sie ist nicht von Apple notarisiert): *Systemeinstellungen › Datenschutz & Sicherheit › Dennoch öffnen*. Alternativ im Terminal: `xattr -dr com.apple.quarantine "/Applications/16 Out OMT Matrix.app"`.
 3. Die Abfrage „eingehende Netzwerkverbindungen erlauben“ bestätigen.
 
-Die App hat kein Dock-Symbol; ihr Fenster öffnet sich in Chrome oder Edge im App-Modus, sonst in Safari. Einstellungen liegen unter `~/Library/Application Support/4OutOMTMatrix/`.
+Die App hat kein Dock-Symbol; ihr Fenster öffnet sich in Chrome oder Edge im App-Modus, sonst in Safari. Einstellungen liegen unter `~/Library/Application Support/16OutOMTMatrix/`.
 
 ### Bedienung
 
@@ -75,7 +75,7 @@ Eine Zeile pro Befehl (UTF-8, `\n` oder `\r\n`), Port 6390. Testbar mit `telnet 
 Beim Verbinden und bei jeder Änderung – auch aus dem Fenster – schickt der Router an alle verbundenen Clients:
 
 ```
-HELLO 4OutOMTMatrix 1.2.0 4
+HELLO 16OutOMTMatrix 1.2.0 4
 OUT 1 REGIE-PC (Matrix Out 1)
 CH 1 CAM2 (Camera 2)
 SOURCES 2
@@ -96,9 +96,9 @@ Fehler kommen als `ERR <text>`.
 Die Release-Dateien baut die GitHub Action `.github/workflows/build.yml` automatisch, sobald eine Release veröffentlicht wird. Lokal:
 
 ```
-dotnet publish 4OutOMTMatrix.csproj -c Release -p:UseAppHost=false -o dist
+dotnet publish 16OutOMTMatrix.csproj -c Release -p:UseAppHost=false -o dist
 x86_64-w64-mingw32-windres launcher/res.rc -O coff -o res.o
-x86_64-w64-mingw32-gcc -municode -mwindows -O2 -s launcher/launcher.c res.o -o "dist/4 Out OMT Matrix.exe"
+x86_64-w64-mingw32-gcc -municode -mwindows -O2 -s launcher/launcher.c res.o -o "dist/16 Out OMT Matrix.exe"
 ```
 
 Test (Linux, .NET 8 SDK): `test/run-linux-test.sh`

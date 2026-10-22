@@ -18,7 +18,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/StockwerkOrange/4-Out-OMT-Matrix.git",
+		"url": "git+https://github.com/StockwerkOrange/16-Out-OMT-Matrix.git",
 		"directory": "companion-module"
 	},
 	"author": "Matthias Stock <ClaudeAI@stockwerkorange.com>"

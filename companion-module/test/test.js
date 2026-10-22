@@ -61,7 +61,7 @@ const server = http.createServer((req, res) => {
 })
 
 
-// ---- mock 4 Out OMT Matrix (TCP) ----
+// ---- mock 16 Out OMT Matrix (TCP) ----
 const net = require('node:net')
 const vcRoutes = ['', '', '', '']
 const vcSources = ['CAM1 (Camera 1)', 'CAM2 (Camera 2)']
@@ -69,7 +69,7 @@ const vcClients = new Set()
 const vcServer = net.createServer((sock) => {
 	vcClients.add(sock)
 	sock.on('close', () => vcClients.delete(sock))
-	sock.write(['HELLO 4OutOMTMatrix 1.1.0 4', ...vcRoutes.map((_, i) => `OUT ${i + 1} PC (Matrix Out ${i + 1})`),
+	sock.write(['HELLO 16OutOMTMatrix 1.1.0 4', ...vcRoutes.map((_, i) => `OUT ${i + 1} PC (Matrix Out ${i + 1})`),
 		...vcRoutes.map((r, i) => `CH ${i + 1} ${r}`.trimEnd()), `SOURCES ${vcSources.length}`, ...vcSources.map((s) => `SRC ${s}`)].join('\r\n') + '\r\n')
 	let buf = ''
 	sock.on('data', (d) => {
@@ -169,7 +169,7 @@ async function main() {
 	await p.destroy()
 
 
-	// ---- 4 Out OMT Matrix (TCP); parser also accepts the 1.0 greeting ----
+	// ---- 16 Out OMT Matrix (TCP); parser also accepts the 1.0 greeting ----
 	// parser: split SOURCES block, CH with spaces, out-of-range ignored
 	const st = api.newControlState()
 	;['HELLO OMTViewerControl 1.0.0 2', 'OUT 1 PC (Viewer Control 1)', 'CH 1 A (Cam One)', 'CH 9 x', 'SOURCES 2', 'SRC A (Cam One)']

@@ -383,7 +383,7 @@ class OmtMonitorInstance extends InstanceBase {
 		this.setPresetDefinitions(presets)
 	}
 
-	// ---- 4 Out OMT Matrix (TCP, formerly Stockwerk Matrix Router / OMT Viewer Control) ----
+	// ---- 16 Out OMT Matrix (TCP, formerly Stockwerk Matrix Router / OMT Viewer Control) ----
 
 	connectControl() {
 		const gen = this.generation
@@ -544,7 +544,7 @@ class OmtMonitorInstance extends InstanceBase {
 				width: 12,
 				label: 'Information',
 				value:
-					'OMT Mini: enable the web control panel under Settings &gt; Web (default port 7400, no password).<br/>omtplayer (Raspberry Pi 5): web interface on port 8080.<br/>4 Out OMT Matrix: TCP port 6390 – point the viewer (vMix OMT Viewer, Sienna, OBS …) once at &quot;HOST (Matrix Out 1)&quot;.',
+					'OMT Mini: enable the web control panel under Settings &gt; Web (default port 7400, no password).<br/>omtplayer (Raspberry Pi 5): web interface on port 8080.<br/>16 Out OMT Matrix: TCP port 6390 – point the viewer (vMix OMT Viewer, Sienna, OBS …) once at &quot;HOST (Matrix Out 1)&quot;.',
 			},
 			{
 				type: 'dropdown',
@@ -554,7 +554,7 @@ class OmtMonitorInstance extends InstanceBase {
 				choices: [
 					{ id: 'omtmini', label: 'OMT Mini (Windows)' },
 					{ id: 'omtplayer', label: 'omtplayer (Raspberry Pi 5)' },
-					{ id: 'viewercontrol', label: '4 Out OMT Matrix (TCP) – any OMT viewer' },
+					{ id: 'viewercontrol', label: '16 Out OMT Matrix (TCP) – any OMT viewer' },
 				],
 				default: 'omtmini',
 			},

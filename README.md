@@ -1,4 +1,4 @@
-# 4 Out OMT Matrix
+# 16 Out OMT Matrix
 
 Kreuzschiene für [Open Media Transport (OMT)](https://github.com/openmediatransport): macht **jeden OMT-Viewer fernsteuerbar** – auch den vMix OMT Viewer, Sienna OMT Video Monitor oder OBS, die selbst keine Fernsteuerung haben. Dazu ein Bitfocus-Companion-Modul für Stream-Deck-Bedienung. Früher: *Stockwerk Matrix Router*. Nicht zu verwechseln mit dem *OMT Matrix Router* aus den vMix OMT Tools.
 
@@ -9,7 +9,7 @@ Kreuzschiene für [Open Media Transport (OMT)](https://github.com/openmediatrans
 | Ordner | Was |
 | --- | --- |
 | [`router/`](router/) | Die App: virtuelle Ausgänge, Kreuzschienen-Fenster, TCP-Steuerung (Port 6390). Windows, macOS, Linux mit .NET 8. |
-| [`companion-module/`](companion-module/) | Companion-Modul **omt-monitor** für Companion 4.0+: 4 Out OMT Matrix, [OMT Mini](https://github.com/ForesterMW/omt-mini) und [omtplayer](https://github.com/openmediatransport/omtplayer). |
+| [`companion-module/`](companion-module/) | Companion-Modul **omt-monitor** für Companion 4.0+: 16 Out OMT Matrix, [OMT Mini](https://github.com/ForesterMW/omt-mini) und [omtplayer](https://github.com/openmediatransport/omtplayer). |
 
 ## Prinzip
 
@@ -18,7 +18,7 @@ Kamera ──OMT──┐
 Folien ──OMT──┼──▶ Viewer (vMix OMT Viewer, Sienna, OBS …)
 Grafik ──OMT──┘        ▲ zeigt einmalig "REGIE-PC (Matrix Out 1)"
                        │ wird per OMT-Redirect umgeleitet
-          4 Out OMT Matrix ◀── Fenster / Companion / TCP
+          16 Out OMT Matrix ◀── Fenster / Companion / TCP
 ```
 
 Das Video läuft direkt von der Quelle zum Viewer, nicht durch den Router.
@@ -26,19 +26,19 @@ Das Video läuft direkt von der Quelle zum Viewer, nicht durch den Router.
 ## Schnellstart
 
 1. **Router:** passendes ZIP aus den [Releases](../../releases) laden – keine weitere Installation nötig:
-   - Windows: `4OutOMTMatrix-windows-x64.zip` → `4 Out OMT Matrix.exe`
-   - Mac: `4OutOMTMatrix-macos-apple-silicon.zip` (M1–M4) oder `…-macos-intel.zip` → `4 Out OMT Matrix.app`
+   - Windows: `16OutOMTMatrix-windows-x64.zip` → `16 Out OMT Matrix.exe`
+   - Mac: `16OutOMTMatrix-macos-apple-silicon.zip` (M1–M4) oder `…-macos-intel.zip` → `16 Out OMT Matrix.app`
    - `…-portable.zip` läuft überall, braucht aber die .NET 8 Runtime.
 
    Details: [router/README.md](router/README.md).
 2. Im Viewer einmalig `RECHNERNAME (Matrix Out 1)` als Quelle wählen.
-3. **Companion:** `omt-monitor-x.y.z.tgz` aus den Releases unter *Modules › Import module package* laden, Verbindung „OMT Monitor“ anlegen, Gerät *4 Out OMT Matrix (TCP)*, IP des Router-Rechners, Port 6390.
+3. **Companion:** `omt-monitor-x.y.z.tgz` aus den Releases unter *Modules › Import module package* laden, Verbindung „OMT Monitor“ anlegen, Gerät *16 Out OMT Matrix (TCP)*, IP des Router-Rechners, Port 6390.
 
 ## Selbst bauen
 
 ```
 # Router (.NET 8 SDK, für den Windows-Starter zusätzlich mingw-w64)
-cd router && dotnet publish 4OutOMTMatrix.csproj -c Release -p:UseAppHost=false -o dist
+cd router && dotnet publish 16OutOMTMatrix.csproj -c Release -p:UseAppHost=false -o dist
 
 # Companion-Modul (Node 22)
 cd companion-module && npm ci && npm test && npm run package

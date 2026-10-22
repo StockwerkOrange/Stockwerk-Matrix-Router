@@ -4,10 +4,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyName>4OutOMTMatrix</AssemblyName>
+    <AssemblyName>16OutOMTMatrix</AssemblyName>
     <RootNamespace>OMTMatrix</RootNamespace>
-    <Product>4 Out OMT Matrix</Product>
-    <AssemblyTitle>4 Out OMT Matrix</AssemblyTitle>
+    <Product>16 Out OMT Matrix</Product>
+    <AssemblyTitle>16 Out OMT Matrix</AssemblyTitle>
     <Company>Stockwerk Orange</Company>
     <Version>1.2.0</Version>
     <InvariantGlobalization>true</InvariantGlobalization>

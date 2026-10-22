@@ -1,4 +1,4 @@
-// 4 Out OMT Matrix (formerly Stockwerk Matrix Router / OMT Viewer Control)
+// 16 Out OMT Matrix (formerly Stockwerk Matrix Router / OMT Viewer Control)
 // Publishes N virtual OMT sources ("HOST (Matrix Out 1)" ...). Point any OMT receiver
 // (vMix OMT Viewer, Sienna, OBS, omtplayer) at one of them once; switching then happens over
 // a line-based TCP protocol or the built-in panel by redirecting that receiver to the chosen
@@ -52,7 +52,7 @@ static class Program
     static readonly string Version = (System.Reflection.Assembly.GetExecutingAssembly()
         .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
         .FirstOrDefault() as System.Reflection.AssemblyInformationalVersionAttribute)?.InformationalVersion.Split('+')[0] ?? "0.0.0";
-    const string AppName = "4 Out OMT Matrix";
+    const string AppName = "16 Out OMT Matrix";
     const int MaxLine = 1024, MaxAddress = 255, MaxClients = 32;
 
     static Config cfg;
@@ -124,7 +124,7 @@ static class Program
         var dir = AppContext.BaseDirectory;
         if (!dir.Contains(".app/Contents/")) return dir;
         var support = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        dir = Path.Combine(support, "4OutOMTMatrix");
+        dir = Path.Combine(support, "16OutOMTMatrix");
         Directory.CreateDirectory(dir);
         // 1.1 kept its settings under the old app name; take them over once.
         var old = Path.Combine(support, "StockwerkMatrixRouter", "matrixrouter.json");
@@ -139,7 +139,7 @@ static class Program
     static void OpenWindow()
     {
         var url = PanelUrl;
-        var profile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "4OutOMTMatrix", "window");
+        var profile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "16OutOMTMatrix", "window");
         var appArgs = $"--app={url} --user-data-dir=\"{profile}\" --window-size=1180,780 --no-first-run --no-default-browser-check";
         try
         {
@@ -317,7 +317,7 @@ static class Program
 
     static IEnumerable<string> Greeting()
     {
-        yield return $"HELLO 4OutOMTMatrix {Version} {outs.Length}";
+        yield return $"HELLO 16OutOMTMatrix {Version} {outs.Length}";
         for (int i = 0; i < outs.Length; i++) yield return $"OUT {i + 1} {outs[i].Address}";
         foreach (var l in RouteLines()) yield return l;
         foreach (var l in SourceLines()) yield return l;

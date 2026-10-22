@@ -3,11 +3,11 @@
 	"id": "omt-monitor",
 	"name": "omt-monitor",
 	"shortname": "OMT Monitor",
-	"description": "Control Open Media Transport monitors: OMT Mini, omtplayer and any OMT viewer via 4 Out OMT Matrix",
+	"description": "Control Open Media Transport monitors: OMT Mini, omtplayer and any OMT viewer via 16 Out OMT Matrix",
 	"version": "0.0.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/StockwerkOrange/4-Out-OMT-Matrix.git",
-	"bugs": "https://github.com/StockwerkOrange/4-Out-OMT-Matrix/issues",
+	"repository": "git+https://github.com/StockwerkOrange/16-Out-OMT-Matrix.git",
+	"bugs": "https://github.com/StockwerkOrange/16-Out-OMT-Matrix/issues",
 	"maintainers": [{ "name": "Matthias Stock", "email": "ClaudeAI@stockwerkorange.com" }],
 	"runtime": {
 		"type": "node22",
@@ -17,6 +17,6 @@
 	},
 	"legacyIds": [],
 	"manufacturer": "Open Media Transport",
-	"products": ["OMT Mini", "omtplayer", "4 Out OMT Matrix"],
+	"products": ["OMT Mini", "omtplayer", "16 Out OMT Matrix"],
 	"keywords": ["OMT", "Open Media Transport", "Video", "Monitor", "Viewer"]
 }
