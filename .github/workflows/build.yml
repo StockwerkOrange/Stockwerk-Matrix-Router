@@ -57,19 +57,19 @@ jobs:
         run: |
           $ver = if ($env:GITHUB_EVENT_NAME -eq 'release') { '${{ github.event.release.tag_name }}'.TrimStart('v') } else { '' }
           $verArg = if ($ver) { "-p:Version=$ver" } else { '' }
-          dotnet publish router/StockwerkMatrixRouter.csproj -c Release -r win-x64 --self-contained true `
+          dotnet publish router/4OutOMTMatrix.csproj -c Release -r win-x64 --self-contained true `
             -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true `
             -p:OutputType=WinExe -p:ApplicationIcon=launcher/icon.ico $verArg -o publish
-          $dir = 'dist/StockwerkMatrixRouter'
+          $dir = 'dist/4OutOMTMatrix'
           New-Item -ItemType Directory -Force $dir | Out-Null
-          Move-Item publish/StockwerkMatrixRouter.exe "$dir/Stockwerk Matrix Router.exe"
+          Move-Item publish/4OutOMTMatrix.exe "$dir/4 Out OMT Matrix.exe"
           Copy-Item router/README.md, LICENSE $dir
           Copy-Item router/libomtnet/LICENSE.txt "$dir/libomtnet-LICENSE.txt"
-          Compress-Archive -Path $dir -DestinationPath dist/StockwerkMatrixRouter-windows-x64.zip
+          Compress-Archive -Path $dir -DestinationPath dist/4OutOMTMatrix-windows-x64.zip
       - uses: actions/upload-artifact@v7
         with:
           archive: false
-          path: dist/StockwerkMatrixRouter-windows-x64.zip
+          path: dist/4OutOMTMatrix-windows-x64.zip
 
   router-portable:
     # Needs the .NET 8 runtime; runs on Windows (via the small starter), macOS and Linux.
@@ -83,18 +83,18 @@ jobs:
       - name: Publish
         run: |
           VER=""; [ "$GITHUB_EVENT_NAME" = release ] && VER="-p:Version=${GITHUB_REF_NAME#v}"
-          D=dist/StockwerkMatrixRouter
-          dotnet publish router/StockwerkMatrixRouter.csproj -c Release -p:UseAppHost=false $VER -o $D
+          D=dist/4OutOMTMatrix
+          dotnet publish router/4OutOMTMatrix.csproj -c Release -p:UseAppHost=false $VER -o $D
           rm -f $D/*.pdb
           (cd router && x86_64-w64-mingw32-windres launcher/res.rc -O coff -o ../res.o)
-          x86_64-w64-mingw32-gcc -municode -mwindows -O2 -s router/launcher/launcher.c res.o -o "$D/Stockwerk Matrix Router.exe"
+          x86_64-w64-mingw32-gcc -municode -mwindows -O2 -s router/launcher/launcher.c res.o -o "$D/4 Out OMT Matrix.exe"
           cp router/launcher/start-mac-linux.sh $D/ && chmod +x $D/start-mac-linux.sh
           cp router/README.md LICENSE $D/ && cp router/libomtnet/LICENSE.txt $D/libomtnet-LICENSE.txt
-          (cd dist && zip -qr StockwerkMatrixRouter-portable.zip StockwerkMatrixRouter)
+          (cd dist && zip -qr 4OutOMTMatrix-portable.zip 4OutOMTMatrix)
       - uses: actions/upload-artifact@v7
         with:
           archive: false
-          path: dist/StockwerkMatrixRouter-portable.zip
+          path: dist/4OutOMTMatrix-portable.zip
 
   router-macos:
     # Self-contained .app per CPU, ad-hoc signed (required on Apple Silicon). Not notarized.
@@ -113,14 +113,14 @@ jobs:
           dotnet-version: 8.0.x
       - name: Build app
         run: |
-          VER=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' router/StockwerkMatrixRouter.csproj)
+          VER=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' router/4OutOMTMatrix.csproj)
           [ "$GITHUB_EVENT_NAME" = release ] && VER="${GITHUB_REF_NAME#v}"
-          dotnet publish router/StockwerkMatrixRouter.csproj -c Release -r ${{ matrix.rid }} --self-contained true \
+          dotnet publish router/4OutOMTMatrix.csproj -c Release -r ${{ matrix.rid }} --self-contained true \
             -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true \
             -p:Version=$VER -o publish
-          APP="dist/StockwerkMatrixRouter/Stockwerk Matrix Router.app"
+          APP="dist/4OutOMTMatrix/4 Out OMT Matrix.app"
           mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-          cp publish/StockwerkMatrixRouter "$APP/Contents/MacOS/"
+          cp publish/4OutOMTMatrix "$APP/Contents/MacOS/"
           sed "s/__VERSION__/$VER/" router/launcher/Info.plist > "$APP/Contents/Info.plist"
           mkdir icon.iconset
           for s in 16 32 128 256 512; do
@@ -129,12 +129,12 @@ jobs:
           done
           iconutil -c icns icon.iconset -o "$APP/Contents/Resources/AppIcon.icns"
           codesign --force --deep --sign - "$APP"
-          cp router/README.md LICENSE dist/StockwerkMatrixRouter/ && cp router/libomtnet/LICENSE.txt dist/StockwerkMatrixRouter/libomtnet-LICENSE.txt
-          ditto -c -k --keepParent dist/StockwerkMatrixRouter StockwerkMatrixRouter-${{ matrix.name }}.zip
+          cp router/README.md LICENSE dist/4OutOMTMatrix/ && cp router/libomtnet/LICENSE.txt dist/4OutOMTMatrix/libomtnet-LICENSE.txt
+          ditto -c -k --keepParent dist/4OutOMTMatrix 4OutOMTMatrix-${{ matrix.name }}.zip
       - uses: actions/upload-artifact@v7
         with:
           archive: false
-          path: StockwerkMatrixRouter-${{ matrix.name }}.zip
+          path: 4OutOMTMatrix-${{ matrix.name }}.zip
 
   release:
     # Runs every time so the hand-off is tested too; uploads only for a published release.

@@ -1,18 +1,18 @@
 #include <winver.h>
 1 ICON "launcher/icon.ico"
 1 VERSIONINFO
-FILEVERSION 1,1,0,0
-PRODUCTVERSION 1,1,0,0
+FILEVERSION 1,2,0,0
+PRODUCTVERSION 1,2,0,0
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
     BLOCK "040704B0"
     BEGIN
       VALUE "CompanyName", "Stockwerk Orange"
-      VALUE "FileDescription", "Stockwerk Matrix Router"
-      VALUE "FileVersion", "1.1.0"
-      VALUE "ProductName", "Stockwerk Matrix Router"
-      VALUE "ProductVersion", "1.1.0"
+      VALUE "FileDescription", "4 Out OMT Matrix"
+      VALUE "FileVersion", "1.2.0"
+      VALUE "ProductName", "4 Out OMT Matrix"
+      VALUE "ProductVersion", "1.2.0"
       VALUE "LegalCopyright", "MIT License, Matthias Stock"
     END
   END

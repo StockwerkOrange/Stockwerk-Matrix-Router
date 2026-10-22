@@ -87,7 +87,7 @@ async function playerSetSource(base, source) {
 	})
 }
 
-// ---- Stockwerk Matrix Router (TCP, line based) -----------------------------------
+// ---- 4 Out OMT Matrix (TCP, line based) -----------------------------------
 
 function newControlState() {
 	return { outputs: [], routes: [], sources: [], pending: null, pendingCount: 0, version: '' }

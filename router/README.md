@@ -1,6 +1,6 @@
-# Stockwerk Matrix Router
+# 4 Out OMT Matrix
 
-Macht **jeden OMT-Viewer umschaltbar** – auch solche ohne eigene Fernsteuerung (vMix OMT Viewer, Sienna OMT Video Monitor, OBS-Plugin, omtplayer). Bedienung über das eigene App-Fenster (Kreuzschiene), per Companion oder per TCP. Früherer Name: *OMT Viewer Control*.
+Macht **jeden OMT-Viewer umschaltbar** – auch solche ohne eigene Fernsteuerung (vMix OMT Viewer, Sienna OMT Video Monitor, OBS-Plugin, omtplayer). Bedienung über das eigene App-Fenster (Kreuzschiene), per Companion oder per TCP. Frühere Namen: *Stockwerk Matrix Router*, *OMT Viewer Control*.
 
 ## So funktioniert es
 
@@ -18,28 +18,28 @@ Im Viewer wählst du **einmalig** einen Ausgang als Quelle. Danach schaltest du 
 
 ## Installation
 
-Aus den [Releases](https://github.com/StockwerkOrange/Stockwerk-Matrix-Router/releases) das passende ZIP laden:
+Aus den [Releases](https://github.com/StockwerkOrange/4-Out-OMT-Matrix/releases) das passende ZIP laden:
 
 | Datei | Für | Voraussetzung |
 | --- | --- | --- |
-| `StockwerkMatrixRouter-windows-x64.zip` | Windows 10/11 | keine |
-| `StockwerkMatrixRouter-macos-apple-silicon.zip` | Mac mit M1–M4 | macOS 12+ |
-| `StockwerkMatrixRouter-macos-intel.zip` | Mac mit Intel-Prozessor | macOS 12+ |
-| `StockwerkMatrixRouter-portable.zip` | Windows, macOS, Linux | [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) |
+| `4OutOMTMatrix-windows-x64.zip` | Windows 10/11 | keine |
+| `4OutOMTMatrix-macos-apple-silicon.zip` | Mac mit M1–M4 | macOS 12+ |
+| `4OutOMTMatrix-macos-intel.zip` | Mac mit Intel-Prozessor | macOS 12+ |
+| `4OutOMTMatrix-portable.zip` | Windows, macOS, Linux | [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) |
 
 ### Windows
 
-1. ZIP entpacken (ganzen Ordner behalten), **„Stockwerk Matrix Router.exe“** starten.
+1. ZIP entpacken (ganzen Ordner behalten), **„4 Out OMT Matrix.exe“** starten.
 2. Die Firewall-Abfrage mit „Zulassen“ (privates Netz) bestätigen – nötig für TCP 6390 und die OMT-Ports 6400–6600.
 3. Meldet SmartScreen „Der Computer wurde durch Windows geschützt“: *Weitere Informationen › Trotzdem ausführen* (das Programm ist nicht signiert).
 
 ### Mac
 
-1. ZIP entpacken, **„Stockwerk Matrix Router.app“** z. B. nach *Programme* ziehen.
-2. Beim ersten Öffnen meldet macOS, dass die App nicht überprüft werden kann (sie ist nicht von Apple notarisiert): *Systemeinstellungen › Datenschutz & Sicherheit › Dennoch öffnen*. Alternativ im Terminal: `xattr -dr com.apple.quarantine "/Applications/Stockwerk Matrix Router.app"`.
+1. ZIP entpacken, **„4 Out OMT Matrix.app“** z. B. nach *Programme* ziehen.
+2. Beim ersten Öffnen meldet macOS, dass die App nicht überprüft werden kann (sie ist nicht von Apple notarisiert): *Systemeinstellungen › Datenschutz & Sicherheit › Dennoch öffnen*. Alternativ im Terminal: `xattr -dr com.apple.quarantine "/Applications/4 Out OMT Matrix.app"`.
 3. Die Abfrage „eingehende Netzwerkverbindungen erlauben“ bestätigen.
 
-Die App hat kein Dock-Symbol; ihr Fenster öffnet sich in Chrome oder Edge im App-Modus, sonst in Safari. Einstellungen liegen unter `~/Library/Application Support/StockwerkMatrixRouter/`.
+Die App hat kein Dock-Symbol; ihr Fenster öffnet sich in Chrome oder Edge im App-Modus, sonst in Safari. Einstellungen liegen unter `~/Library/Application Support/4OutOMTMatrix/`.
 
 ### Bedienung
 
@@ -49,9 +49,12 @@ Das Router-Fenster öffnet sich als eigene App (unter Windows Microsoft Edge im 
 - **Beenden** im Fenster stoppt den Router. Die Viewer bleiben auf ihrer letzten Quelle.
 - **Autostart (Windows):** Verknüpfung auf die .exe in `shell:startup` legen. Mit dem Zusatz `--no-window` im Verknüpfungsziel startet er ohne Fenster.
 
-### Umstieg von OMT Viewer Control 1.0
+### Umstieg von einer älteren Version
 
-Neuen Ordner neben den alten legen und `viewercontrol.json` aus dem alten Ordner hineinkopieren. Der Router übernimmt daraus Name, Ports und Routen – die Viewer müssen nicht neu eingestellt werden.
+Die Viewer müssen nicht neu eingestellt werden – Ausgangsnamen, Ports und Routen werden übernommen:
+
+- **Windows:** neuen Ordner neben den alten legen und `matrixrouter.json` (Stockwerk Matrix Router 1.1) bzw. `viewercontrol.json` (OMT Viewer Control 1.0) aus dem alten Ordner hineinkopieren.
+- **Mac:** passiert automatisch beim ersten Start. Die alte App „Stockwerk Matrix Router“ danach löschen.
 
 ## Einstellungen
 
@@ -72,7 +75,7 @@ Eine Zeile pro Befehl (UTF-8, `\n` oder `\r\n`), Port 6390. Testbar mit `telnet 
 Beim Verbinden und bei jeder Änderung – auch aus dem Fenster – schickt der Router an alle verbundenen Clients:
 
 ```
-HELLO StockwerkMatrixRouter 1.1.0 4
+HELLO 4OutOMTMatrix 1.2.0 4
 OUT 1 REGIE-PC (Matrix Out 1)
 CH 1 CAM2 (Camera 2)
 SOURCES 2
@@ -85,7 +88,7 @@ Fehler kommen als `ERR <text>`.
 ## Hinweise
 
 - TCP-Steuerung ohne Passwort – nur im Produktionsnetz betreiben. Das Fenster ist nur vom eigenen Rechner aus erreichbar.
-- Nicht parallel mit dem vMix OMT Matrix Router dieselben Viewer umleiten – die Umschaltungen überschreiben sich.
+- Nicht parallel mit dem *OMT Matrix Router* aus den vMix OMT Tools (anderes Programm) dieselben Viewer umleiten – die Umschaltungen überschreiben sich.
 - Gesteuert wird die Quellenwahl; Vollbild, Mute und Tally bleiben beim Viewer.
 
 ## Selbst bauen
@@ -93,9 +96,9 @@ Fehler kommen als `ERR <text>`.
 Die Release-Dateien baut die GitHub Action `.github/workflows/build.yml` automatisch, sobald eine Release veröffentlicht wird. Lokal:
 
 ```
-dotnet publish StockwerkMatrixRouter.csproj -c Release -p:UseAppHost=false -o dist
+dotnet publish 4OutOMTMatrix.csproj -c Release -p:UseAppHost=false -o dist
 x86_64-w64-mingw32-windres launcher/res.rc -O coff -o res.o
-x86_64-w64-mingw32-gcc -municode -mwindows -O2 -s launcher/launcher.c res.o -o "dist/Stockwerk Matrix Router.exe"
+x86_64-w64-mingw32-gcc -municode -mwindows -O2 -s launcher/launcher.c res.o -o "dist/4 Out OMT Matrix.exe"
 ```
 
 Test (Linux, .NET 8 SDK): `test/run-linux-test.sh`

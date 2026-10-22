@@ -1,6 +1,6 @@
 {
 	"name": "omt-monitor",
-	"version": "1.2.0",
+	"version": "1.3.0",
 	"main": "src/main.js",
 	"scripts": {
 		"test": "node test/test.js",
@@ -18,7 +18,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/StockwerkOrange/stockwerk-matrix-router.git",
+		"url": "git+https://github.com/StockwerkOrange/4-Out-OMT-Matrix.git",
 		"directory": "companion-module"
 	},
 	"author": "Matthias Stock <ClaudeAI@stockwerkorange.com>"

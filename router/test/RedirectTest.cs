@@ -1,5 +1,5 @@
 // End-to-end check: real libomtnet senders + a real OMTReceive (stand-in for a viewer)
-// switched through Stockwerk Matrix Router over TCP and its panel API. Run via run-linux-test.sh.
+// switched through 4 Out OMT Matrix over TCP and its panel API. Run via run-linux-test.sh.
 using libomtnet;
 using System;
 using System.Diagnostics;
@@ -33,7 +33,7 @@ static class RedirectTest
         var lines = new System.Collections.Concurrent.ConcurrentQueue<string>();
         new Thread(() => { string l; try { while ((l = r.ReadLine()) != null) lines.Enqueue(l); } catch { } }) { IsBackground = true }.Start();
 
-        Check(WaitFor(() => lines.Any(l => l.StartsWith("HELLO StockwerkMatrixRouter"))), "greeting");
+        Check(WaitFor(() => lines.Any(l => l.StartsWith("HELLO 4OutOMTMatrix"))), "greeting");
         var out1 = lines.First(l => l.StartsWith("OUT 1 ")).Substring(6);
         Check(WaitFor(() => lines.Any(l => l == "SRC " + camA.Address), 30000), "discovery lists Camera A");
         Check(!lines.Any(l => l.StartsWith("SRC ") && l.Contains("Matrix Out")), "own outputs not listed");
@@ -64,7 +64,7 @@ static class RedirectTest
         var st = http.GetStringAsync("/api/state").Result;
         Check(st.Contains("\"route\":\"" + camA.Address + "\"") && st.Contains("\"connections\":"), "panel state shows route");
         var page = http.GetAsync("/").Result;
-        Check(page.IsSuccessStatusCode && page.Content.ReadAsStringAsync().Result.Contains("Stockwerk Matrix Router"), "panel page served");
+        Check(page.IsSuccessStatusCode && page.Content.ReadAsStringAsync().Result.Contains("4 Out OMT Matrix"), "panel page served");
         System.Net.Http.HttpResponseMessage Post(string path, string json, bool header)
         {
             var m = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Post, path) { Content = new System.Net.Http.StringContent(json) };

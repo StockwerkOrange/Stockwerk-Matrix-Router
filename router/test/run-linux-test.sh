@@ -4,7 +4,7 @@
 set -e
 HERE=$(cd "$(dirname "$0")/.." && pwd)
 T=$(mktemp -d)
-cp -r "$HERE/libomtnet" "$HERE/Program.cs" "$HERE/StockwerkMatrixRouter.csproj" "$HERE/Panel.cs" "$HERE/panel.html" "$T/"
+cp -r "$HERE/libomtnet" "$HERE/Program.cs" "$HERE/4OutOMTMatrix.csproj" "$HERE/Panel.cs" "$HERE/panel.html" "$T/"
 if ! python3 -c "import socket;socket.socket(socket.AF_INET6)" 2>/dev/null; then
   sed -i 's/AddressFamily.InterNetworkV6, SocketType/AddressFamily.InterNetwork, SocketType/; /IPv6Only, false/d; s/IPAddress.IPv6Any, i/IPAddress.Any, i/' "$T/libomtnet/src/OMTSend.cs"
   sed -i 's/new Socket(AddressFamily.InterNetworkV6, SocketType.Stream/new Socket(AddressFamily.InterNetwork, SocketType.Stream/; /IPv6Only, false/d; s/s.BeginConnect(next, port/s.BeginConnect(next.IsIPv4MappedToIPv6 ? next.MapToIPv4() : next, port/' "$T/libomtnet/src/OMTMultiConnectSocket.cs"
@@ -23,4 +23,4 @@ cat > "$T/test/RedirectTest.csproj" <<P
 P
 (cd "$T" && dotnet build -c Release -nologo -v q >/dev/null)
 (cd "$T/test" && dotnet build -c Release -nologo -v q >/dev/null)
-dotnet "$T/test/bin/Release/net8.0/RedirectTest.dll" "$T/bin/Release/net8.0/StockwerkMatrixRouter.dll"
+dotnet "$T/test/bin/Release/net8.0/RedirectTest.dll" "$T/bin/Release/net8.0/4OutOMTMatrix.dll"

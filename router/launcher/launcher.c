@@ -1,11 +1,11 @@
-// Stockwerk Matrix Router – Windows starter.
-// Starts "dotnet StockwerkMatrixRouter.dll" next to this exe without a console window.
+// 4 Out OMT Matrix – Windows starter.
+// Starts "dotnet 4OutOMTMatrix.dll" next to this exe without a console window.
 // Build: see README ("Selbst bauen").
 #include <windows.h>
 #include <shellapi.h>
 #include <wchar.h>
 
-static const wchar_t *TITLE = L"Stockwerk Matrix Router";
+static const wchar_t *TITLE = L"4 Out OMT Matrix";
 static const wchar_t *DOWNLOAD = L"https://dotnet.microsoft.com/download/dotnet/8.0";
 
 static int findDotnet(wchar_t *out, DWORD n) {
@@ -30,9 +30,9 @@ int WINAPI wWinMain(HINSTANCE h, HINSTANCE p, LPWSTR args, int show) {
     GetModuleFileNameW(NULL, dir, MAX_PATH);
     wchar_t *slash = wcsrchr(dir, L'\\');
     if (slash) *slash = 0;
-    swprintf(dll, MAX_PATH, L"%ls\\StockwerkMatrixRouter.dll", dir);
+    swprintf(dll, MAX_PATH, L"%ls\\4OutOMTMatrix.dll", dir);
     if (GetFileAttributesW(dll) == INVALID_FILE_ATTRIBUTES) {
-        MessageBoxW(NULL, L"StockwerkMatrixRouter.dll fehlt. Bitte den ganzen Ordner aus dem ZIP entpacken, nicht nur die .exe.", TITLE, MB_ICONERROR);
+        MessageBoxW(NULL, L"4OutOMTMatrix.dll fehlt. Bitte den ganzen Ordner aus dem ZIP entpacken, nicht nur die .exe.", TITLE, MB_ICONERROR);
         return 1;
     }
     if (!findDotnet(dotnet, MAX_PATH)) { askRuntime(L".NET wurde auf diesem Rechner nicht gefunden."); return 1; }
